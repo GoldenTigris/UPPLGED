@@ -33,10 +33,10 @@ public class Commandvote implements CommandExecutor {
 				String rep4 = config.getString("Rep4");
 				String rep5 = config.getString("Rep5");
 				String rep6 = config.getString("Rep6");
-        String rep7 = config.getString("Rep7");
-        String rep8 = config.getString("Rep8");
-        String rep9 = config.getString("Rep9");
-        String rep10 = config.getString("Rep10");
+        			String rep7 = config.getString("Rep7");
+        			String rep8 = config.getString("Rep8");
+       				String rep9 = config.getString("Rep9");
+        			String rep10 = config.getString("Rep10");
         
 				p.sendMessage(rep0);
 				p.sendMessage(rep1);
@@ -45,7 +45,7 @@ public class Commandvote implements CommandExecutor {
 				p.sendMessage(rep4);
 				p.sendMessage(rep5);
 				p.sendMessage(rep6);
-        p.sendMessage(rep7);
+        			p.sendMessage(rep7);
 				p.sendMessage(rep8);
 				p.sendMessage(rep9);
 				p.sendMessage(rep10);
