@@ -1,0 +1,121 @@
+Package fr.gt;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Logger;
+
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+
+public class Loc extends JavaPlugin implements Listener {
+	public Logger log = Logger.getLogger("Minecraft");
+
+	@Override
+	public void onEnable() {
+		getServer().getPluginManager().registerEvents(this, this);
+		log.info("[Loc] has been enabled !");
+
+	}
+
+	@Override
+	public void onDisable() {
+		log.info("[Loc] has been disabled !");
+		MySQL.disconnect();
+	}
+
+	@EventHandler
+	private void onPlayerDisconnect(PlayerQuitEvent event) {
+		Player p = event.getPlayer();
+		Location disco = p.getLocation();
+		System.out.println("le joueur " + p + "s'est déconnecté depuis la position: " + disco);
+		MySQL.connection();
+		if(hasAccount(p)){ 
+			upload(p); 
+						
+		}else{
+		
+		if (!hasAccount(p)) {
+			PreparedStatement sts;
+			try {
+				sts = MySQL.getConnection().prepareStatement("INSERT INTO Loca (Uuid, Pseudo, Monde, X, Y, Z, Pitch, Yaw) VALUE (?,?,?,?,?,?,?,?) ");
+				sts.setString(1, p.getUniqueId().toString());
+				sts.setString(2, p.getName());
+				sts.setString(3, p.getLocation().getWorld().getName().toString());
+				sts.setDouble(4, p.getLocation().getX());
+				sts.setDouble(5, p.getLocation().getY());
+				sts.setDouble(6, p.getLocation().getZ());
+				sts.setDouble(7, p.getLocation().getPitch());
+				sts.setDouble(8, p.getLocation().getYaw());
+				sts.executeUpdate();
+				sts.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			MySQL.disconnect();
+		}
+		}
+	}
+
+	private boolean hasAccount(Player player) {
+
+		try {
+			PreparedStatement sts = MySQL.getConnection().prepareStatement("SELECT UUID FROM Loca WHERE uuid = ?");
+			sts.setString(1, player.getUniqueId().toString());
+			ResultSet resultat = sts.executeQuery();
+			boolean hasAccount = resultat.next();
+			System.out.println(player.getName() + " already in DB");
+			sts.close();
+			return hasAccount;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+	
+	private void upload(Player p) {
+	try {
+		PreparedStatement stw = MySQL.getConnection().prepareStatement("UPDATE Loca SET Monde = ? WHERE Uuid = ?");
+		stw.setString(1, p.getLocation().getWorld().getName().toString());
+		stw.setString(2, p.getUniqueId().toString());
+		stw.executeUpdate();
+		PreparedStatement stx = MySQL.getConnection().prepareStatement("UPDATE Loca SET X = ? WHERE Uuid = ?");
+		stx.setDouble(1, p.getLocation().getX());
+		stx.setString(2, p.getUniqueId().toString());
+		stx.executeUpdate();
+		PreparedStatement sty = MySQL.getConnection().prepareStatement("UPDATE Loca SET Y = ? WHERE Uuid = ?");
+		sty.setDouble(1, p.getLocation().getY());
+		sty.setString(2, p.getUniqueId().toString());
+		sty.executeUpdate();
+		PreparedStatement stz = MySQL.getConnection().prepareStatement("UPDATE Loca SET Z = ? WHERE Uuid = ?");
+		stz.setDouble(1, p.getLocation().getZ());
+		stz.setString(2, p.getUniqueId().toString());
+		stz.executeUpdate();
+		PreparedStatement stpi = MySQL.getConnection().prepareStatement("UPDATE Loca SET Pitch = ? WHERE Uuid = ?");
+		stpi.setDouble(1, p.getLocation().getPitch());
+		stpi.setString(2, p.getUniqueId().toString());
+		stpi.executeUpdate();
+		PreparedStatement sts = MySQL.getConnection().prepareStatement("UPDATE Loca SET Yaw = ? WHERE Uuid = ?");
+		sts.setDouble(1, p.getLocation().getYaw());
+		sts.setString(2, p.getUniqueId().toString());
+		sts.executeUpdate();
+		sts.close();
+		stw.close();
+		stx.close();
+		sty.close();
+		stz.close();
+		stpi.close();
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	MySQL.disconnect();
+}
+
+}
